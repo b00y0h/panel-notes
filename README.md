@@ -1,125 +1,154 @@
-# Panel Notes
+# ⚡ Panel Notes
 
-Panel Notes is a small, self-hosted web app for mapping and documenting an electrical breaker panel.
+> A dead-simple, self-hosted web app for mapping and documenting your electrical breaker panel. Open it with a QR code. Never wonder again.
 
-It grew out of <a href="https://github.com/CCOSTAN/Home-AssistantConfig/issues/1547" target="_blank" rel="noopener">this Home Assistant issue</a> after replacing a couple of garage lights and realizing the handwritten directory on the door wasn" + "'" + "t cutting it anymore.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-Ready-green)](https://nodejs.org/)
+[![Docker Ready](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
 
-The goal is simple:
+## 🎯 Why Panel Notes?
 
-- See the whole panel at a glance (odd on the left, even on the right).
-- Double-click a breaker to see its label, notes, and linked devices.
-- Open the app instantly from a QR code taped to the panel.
-<br>From this: 
-<img width="452" height="559" alt="image" src="https://github.com/user-attachments/assets/7f746eac-156a-4c3e-87a1-9fe119eb4d83" />
-To this: 
-<img width="445" height="828" alt="image" src="https://github.com/user-attachments/assets/2a3e6ae4-ca11-4bc9-aeed-92994d89ac28" />
+Got new garage lights? Need to know what's behind breaker B8? Panel Notes is the answer. It grew out of [this Home Assistant issue](https://github.com/CCOSTAN/Home-AssistantConfig/issues/1547) after realizing a handwritten directory on the panel door wasn't cutting it anymore.
 
-## Features
+**The goal is simple:**
+- 👀 See the whole panel at a glance (odd on the left, even on the right)
+- 📝 Double-click any breaker to see its label, notes, and linked devices
+- 📱 Open the app instantly from a QR code taped to the panel
 
-- 40-slot GE panel layout (1A/1B | 2A/2B style), but easy to adapt.
-- Mobile-first UI; both sides of the panel stay visible on phones.
-- Modal editor for breaker details (label + notes + linked devices).
-- CSV-backed data so you can edit or back it up with any text editor.
-- Simple REST API ready for future integrations (e.g., Home Assistant).
+<div align="center">
+  <img alt="Panel overview" src="https://github.com/user-attachments/assets/7f746eac-156a-4c3e-87a1-9fe119eb4d83" width="350" />
+  <img alt="Breaker details" src="https://github.com/user-attachments/assets/69ee1785-6b18-4d0d-a0fd-d299a98c76d9" width="350" />
+  <img alt="Mobile view" src="https://github.com/user-attachments/assets/a4f0c177-fd55-4eef-adc7-930c8bcac695" width="350" />
+</div>
 
-## Stack
+## ✨ Features
 
-- Frontend: React + Vite (modern, component-based, mobile-first).
-- Backend: Express (Node) serving the API and static build.
-- Data: Flat CSV in ./data (reakers.csv, devices.csv).
-- Docker: Multi-stage build, app listens on PORT (defaults to 8080).
+- 🔧 **40-slot GE panel layout** (1A/1B | 2A/2B style) — but easy to adapt to your setup
+- 📱 **Mobile-first UI** — both sides of the panel stay visible on phones
+- ✏️ **Modal editor** — breaker label + notes + linked devices, all in one place
+- 📄 **CSV-backed data** — edit or back it up with any text editor
+- 🔌 **Simple REST API** — ready for future integrations (Home Assistant, anyone?)
 
-## Quickstart (Node)
+## 🛠️ Tech Stack
 
-`ash
-# clone the repo
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React + Vite (modern, component-based, mobile-first) |
+| **Backend** | Express (Node.js) — serves API and static build |
+| **Data** | Flat CSV files (breakers.csv, devices.csv) |
+| **Deployment** | Docker with multi-stage build |
+
+## 🚀 Quick Start
+
+### With Node.js
+
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/panel-notes.git
 cd panel-notes
 
-# install deps
+# Install dependencies
 npm install
 
-# dev mode: Vite + API
+# Start dev mode (Vite + API)
 npm run dev
-# UI: http://localhost:5173
+
+# Open:
+# UI:  http://localhost:5173
 # API: http://localhost:8080
-`
+```
 
-## Quickstart (Docker)
+### With Docker
 
-`ash
-# in the repo root
+```bash
+# In the repo root
 docker compose up --build -d
-# open http://localhost:8080
-`
 
-- Data persists via the bind mount ./data:/app/data.
-- To change the port, set PORT in .env and update the compose mapping if needed.
+# Open http://localhost:8080
+```
 
-## Configuration
+Data persists via bind mount (`./data:/app/data`). Change the port by setting `PORT` in `.env`.
 
-Copy the example env file:
+## ⚙️ Configuration
 
-`ash
+```bash
 cp .env.example .env
-`
+```
 
-Available variables:
+**Environment Variables:**
+- `PORT` – API/web port inside container (default: `8080`)
+- `DATA_DIR` – CSV storage path inside container (default: `/app/data`)
 
-- PORT – API / web port inside the container (default 8080).
-- DATA_DIR – path inside the container where CSVs are stored (default /app/data).
+## 📡 API Reference
 
-## API (for future integrations)
+Simple endpoints, ready for integrations:
 
-These are intentionally simple so Home Assistant or other tools can query them later:
+```
+GET    /api/health                       # Health check
+GET    /api/breakers                     # List all breakers
+GET    /api/breaker/{id}                 # Get breaker details
+PUT    /api/breaker/{id}                 # Update breaker
+GET    /api/devices                      # List all devices
+POST   /api/device                       # Create device
+GET    /api/device/{id}                  # Get device details
+PUT    /api/device/{id}                  # Update device
+GET    /api/search?q=garage              # Search breakers/devices
+GET    /api/map/light-to-breaker         # Device-to-breaker mapping
+```
 
-- GET /api/health
-- GET /api/breakers
-- GET /api/breaker/{id}
-- PUT /api/breaker/{id}
-- GET /api/devices
-- POST /api/device
-- GET /api/device/{id}
-- PUT /api/device/{id}
-- GET /api/search?q=garage
-- GET /api/map/light-to-breaker?deviceId=D1
+## 📊 Data Model
 
-## Data model
+### Breaker
+```
+{
+  id: "A1",              # Internal ID
+  side: "A",             # A or B
+  row: 1,                # Row 1–20
+  label: "Garage Lights",# Human-friendly
+  load_type: "Lighting", # Optional type
+  notes: "...",          # Free-form
+  tags: "garage,lights"  # Comma-separated
+}
+```
 
-- Breaker
-  - id – internal ID (e.g., A1, B2).
-  - side – A or B.
-  - 
-ow – numeric row (1–20).
-  - label – human-friendly description.
-  - load_type – optional type (Lighting, Outlet, etc.).
-  - 
-otes – free-form notes.
-  - 	ags – comma-separated tags.
-- Device
-  - id – internal ID.
-  - 
-ame – device name.
-  - 	ype – e.g., Light, Outlet.
-  - 
-otes – free-form notes.
-  - linked_breakers – comma-separated breaker IDs.
+### Device
+```
+{
+  id: "D1",
+  name: "Garage Light 1",
+  type: "Light",
+  notes: "Main fixture",
+  linked_breakers: "A1,A2"
+}
+```
 
-## QR workflow idea
+## 📲 QR Code Workflow
 
-In my setup, the app runs on a small Docker host on the LAN. I printed a QR code that points to the Panel Notes URL and taped it inside the panel door. If you" + "'" + "re on my Wi-Fi and scan the QR, you land directly on the panel dashboard.
+Here's the dream setup:
 
-That pattern should work in any house or lab:
+1. **Deploy** Panel Notes on a Docker host on your LAN
+2. **Generate** a QR code pointing to the Panel Notes URL (e.g., `http://panel-notes.local:8080`)
+3. **Print & Tape** the QR inside your panel door
+4. **Scan** when working at the panel — instant access to the live map
 
-1. Deploy Panel Notes on a host reachable on your LAN.
-2. Generate a QR code for the URL (e.g., http://panel-notes.local:8080).
-3. Print and tape the QR inside the panel door.
-4. When you" + "'" + "re working at the panel, scan to see the live map.
+Works in any house, lab, or workshop. 🔌
 
-## Contributing
+## 🤝 Contributing
 
-See CONTRIBUTING.md for ideas and guidelines. PRs that improve usability, layout options, or integrations are very welcome.
+We'd love your help! Check [CONTRIBUTING.md](./CONTRIBUTING.md) for ideas and guidelines.
 
-## License
+**Ideas we'd love:**
+- Layout customization for other panel types
+- Home Assistant integration examples
+- Mobile app wrapper
+- Cloud sync option (optional)
 
-MIT – see LICENSE for details.
+## 📄 License
 
+MIT – see [LICENSE](./LICENSE) for details.
+
+---
+
+<div align="center">
+  <strong>Made with ⚡ for home automation enthusiasts everywhere</strong>
+</div>
