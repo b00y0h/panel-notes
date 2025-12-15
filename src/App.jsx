@@ -19,7 +19,58 @@ const tabs = [
   { id: 'search', label: 'Search' }
 ];
 
+const pullToRefreshStorage = 'cc.pull_to_refresh.v1';
+
+const usePullToRefreshReload = () => {
+  useEffect(() => {
+    const enabled = localStorage.getItem(pullToRefreshStorage);
+    if (enabled === '0') return;
+
+    let startY = null;
+    let triggered = false;
+    let pulling = false;
+
+    const isAtTop = () => (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+
+    const onTouchStart = (e) => {
+      if (!isAtTop()) return;
+      if (!e.touches || e.touches.length !== 1) return;
+      startY = e.touches[0].clientY;
+      triggered = false;
+      pulling = true;
+    };
+
+    const onTouchMove = (e) => {
+      if (!pulling || startY === null || triggered) return;
+      if (!isAtTop()) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 90) {
+        triggered = true;
+        window.location.reload();
+      }
+    };
+
+    const onTouchEnd = () => {
+      startY = null;
+      pulling = false;
+      triggered = false;
+    };
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, []);
+};
+
 export default function App() {
+  usePullToRefreshReload();
   const [breakers, setBreakers] = useState([]);
   const [devices, setDevices] = useState([]);
   const [selectedBreakerId, setSelectedBreakerId] = useState(null);
