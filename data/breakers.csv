@@ -4,7 +4,7 @@ A2,A,2,Entry Foyer,Unknown,Active,covers the front outdoor lights too,
 A3,A,3,SPARE,HVAC,Spare,,furnace
 A4,A,4,SPARE,Unknown,Spare,,
 A5,A,5,Furnace #2,Appliance,Active,Double-pole 240V (Furnace),kitchen
-A6,A,6,Water Heater #2,Unknown,Active,,
+A6,A,6,Water Heater #2,Unknown,Active,,devices
 A7,A,7,Cook Top #2,Appliance,Active,,kitchen
 A8,A,8,Office,Unknown,Active,,
 A9,A,9,Kitchen special,Outlet,Active,,kitchen
@@ -22,7 +22,7 @@ A20,A,20,Kitchen Lights,Unknown,Active,,
 B1,B,1,SPARE,Lighting,Spare,,"garage,devices"
 B2,B,2,SPARE,Appliance,Spare,,appliance
 B3,B,3,Furnace #1,Outlet,Active,,office
-B4,B,4,Water Heater #1,Lighting,Active,,kitchen
+B4,B,4,Water Heater #1,Lighting,Active,,"kitchen,devices"
 B5,B,5,Cook Top #1,Outlet,Active,,bath
 B6,B,6,Unknown,Unknown,Active,,garage
 B7,B,7,Microwave,Unknown,Active,,garage

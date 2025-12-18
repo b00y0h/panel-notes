@@ -2,7 +2,14 @@ import React, { useMemo, useState } from 'react';
 import DeviceRow from '../components/DeviceRow.jsx';
 import { slotNumber } from '../utils/slots.js';
 
-export default function DevicesPage({ breakers = [], devices = [], onCreateDevice, onUpdateDevice, onDeleteDevice }) {
+export default function DevicesPage({
+  breakers = [],
+  devices = [],
+  onCreateDevice,
+  onUpdateDevice,
+  onDeleteDevice,
+  onSelectBreaker
+}) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: '', notes: '', linkedBreakers: [] });
 
@@ -105,6 +112,7 @@ export default function DevicesPage({ breakers = [], devices = [], onCreateDevic
             breakers={breakers}
             onUpdate={onUpdateDevice}
             onDelete={onDeleteDevice}
+            onSelectBreaker={onSelectBreaker}
           />
         ))}
       </div>

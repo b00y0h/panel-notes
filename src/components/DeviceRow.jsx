@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { slotNumber } from '../utils/slots.js';
 
-export default function DeviceRow({ device, breakers = [], onUpdate, onDelete }) {
+export default function DeviceRow({ device, breakers = [], onUpdate, onDelete, onSelectBreaker }) {
   const [editing, setEditing] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [pickerSelection, setPickerSelection] = useState(new Set());
@@ -67,7 +67,7 @@ export default function DeviceRow({ device, breakers = [], onUpdate, onDelete })
 
   const linkedLabels = (form.linked_breakers || []).map((id) => {
     const found = breakerList.find((b) => b.id === id);
-    return found ? found.label : id;
+    return { id, label: found ? found.label : id };
   });
 
   return (
@@ -91,14 +91,14 @@ export default function DeviceRow({ device, breakers = [], onUpdate, onDelete })
             <legend>Linked breakers</legend>
             {linkedLabels.length ? (
               <div className="pill-list">
-                {linkedLabels.map((label, idx) => (
-                  <span key={label} className="pill">
-                    {label}
+                {linkedLabels.map((item, idx) => (
+                  <span key={item.id} className="pill">
+                    {item.label}
                     <button
                       type="button"
                       className="pill-remove"
-                      onClick={() => removeBreaker(form.linked_breakers[idx])}
-                      aria-label={`Remove ${label}`}
+                      onClick={() => removeBreaker(item.id)}
+                      aria-label={`Remove ${item.label}`}
                     >
                       ×
                     </button>
@@ -115,89 +115,122 @@ export default function DeviceRow({ device, breakers = [], onUpdate, onDelete })
             </div>
           </fieldset>
 
-          <div className="actions">
-            <button className="ghost" onClick={() => setEditing(false)}>
-              Cancel
+          <div className="actions" style={{ justifyContent: 'space-between' }}>
+            <button
+              className="ghost"
+              style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
+              onClick={() => {
+                if (confirm('Delete this device?')) {
+                  onDelete?.(device.id);
+                }
+              }}
+            >
+              Delete
             </button>
-            <button onClick={handleSave}>Save</button>
+            <div className="stack gap-sm" style={{ flexDirection: 'row' }}>
+              <button className="ghost" onClick={() => setEditing(false)}>
+                Cancel
+              </button>
+              <button onClick={handleSave}>Save</button>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="device-row__view">
-          <div>
-            <p className="eyebrow">{device.type}</p>
-            <h3>{device.name}</h3>
-            {device.notes && <p className="muted">{device.notes}</p>}
-          </div>
-          <div className="device-row__links">
-            {linkedLabels.length ? linkedLabels.map((label) => <span key={label} className="pill">{label}</span>) : <span className="muted">No breaker link</span>}
-          </div>
-          <div className="actions">
-            <button className="ghost" onClick={() => setEditing(true)}>
-              Edit
-            </button>
-            <button className="ghost" onClick={() => onDelete?.(device.id)}>
-              Delete
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showPicker && (
-        <div
-          className="modal-backdrop"
-          onClick={() => {
-            setShowPicker(false);
-            setPickerSelection(new Set());
-          }}
-        >
-          <div
-            className="modal-card"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <div className="modal-close">
+        <div className="device-row__compact-view">
+          <div className="device-row__info">
+            <div style={{ display: 'flex', alignItems: 'baseline' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem' }}>{device.name}</h3>
+            </div>
+            {device.notes && <p className="muted" style={{ fontSize: '0.8rem' }}>{device.notes}</p>}
+          </div >
+          <div className="device-row__data">
+            <div className="device-row__links">
+              {linkedLabels.length ? (
+                linkedLabels.map((item) => (
+                  <span
+                    key={item.id}
+                    className="pill linkable"
+                    style={{ fontSize: '0.65rem', cursor: 'pointer' }}
+                    onClick={() => onSelectBreaker?.(item.id)}
+                  >
+                    {item.label}
+                  </span>
+                ))
+              ) : (
+                <span className="muted" style={{ fontSize: '0.65rem' }}>Not linked</span>
+              )}
+            </div>
+            <div className="actions" style={{ marginTop: 0 }}>
               <button
                 className="ghost"
-                type="button"
-                onClick={() => {
-                  setShowPicker(false);
-                  setPickerSelection(new Set());
-                }}
+                style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                onClick={() => setEditing(true)}
               >
-                Close
-              </button>
-            </div>
-            <div className="card-header">
-              <div>
-                <p className="eyebrow">Select breakers</p>
-                <h3>Choose breakers for {device.name}</h3>
-              </div>
-            </div>
-            <div className="breaker-select__grid" style={{ padding: '0 var(--space-md) var(--space-md)' }}>
-              {breakerList.map((b) => (
-                <label key={b.id} className="breaker-select__item">
-                  <input
-                    type="checkbox"
-                    checked={pickerSelection.has(b.id) || form.linked_breakers.includes(b.id)}
-                    onChange={() => togglePicker(b.id)}
-                  />
-                  <span>{b.label}</span>
-                </label>
-              ))}
-            </div>
-            <div className="actions" style={{ padding: 'var(--space-md)' }}>
-              <button type="button" className="ghost" onClick={() => setShowPicker(false)}>
-                Cancel
-              </button>
-              <button type="button" onClick={applyPicker} disabled={pickerSelection.size === 0}>
-                Add selected
+                Edit
               </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        </div >
+      )
+      }
+
+      {
+        showPicker && (
+          <div
+            className="modal-backdrop"
+            onClick={() => {
+              setShowPicker(false);
+              setPickerSelection(new Set());
+            }}
+          >
+            <div
+              className="modal-card"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <div className="modal-close">
+                <button
+                  className="ghost"
+                  type="button"
+                  onClick={() => {
+                    setShowPicker(false);
+                    setPickerSelection(new Set());
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+              <div className="card-header">
+                <div>
+                  <p className="eyebrow">Select breakers</p>
+                  <h3>Choose breakers for {device.name}</h3>
+                </div>
+              </div>
+              <div className="breaker-select__grid" style={{ padding: '0 var(--space-md) var(--space-md)' }}>
+                {breakerList.map((b) => (
+                  <label key={b.id} className="breaker-select__item">
+                    <input
+                      type="checkbox"
+                      checked={pickerSelection.has(b.id) || form.linked_breakers.includes(b.id)}
+                      onChange={() => togglePicker(b.id)}
+                    />
+                    <span>{b.label}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="actions" style={{ padding: 'var(--space-md)' }}>
+                <button type="button" className="ghost" onClick={() => setShowPicker(false)}>
+                  Cancel
+                </button>
+                <button type="button" onClick={applyPicker} disabled={pickerSelection.size === 0}>
+                  Add selected
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div >
   );
 }

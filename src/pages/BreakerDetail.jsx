@@ -123,7 +123,7 @@ export default function BreakerDetail({ breaker, devices, onSave, readOnly = fal
             <div className="pill-list">
               {linkedDevices.map((device) => (
                 <span key={device.id} className="pill">
-                  {device.name} • {device.type}
+                  {device.name}
                   {!readOnly && (
                     <button
                       type="button"

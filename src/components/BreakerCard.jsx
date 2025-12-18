@@ -16,17 +16,6 @@ export default function BreakerCard({ breaker, selected, onSelect, onEdit }) {
         <span className="breaker-card__slot">{displayNumber}</span>
       </div>
       <div className="breaker-card__label">{breaker.label || 'Unnamed'}</div>
-      {breaker.linked_devices?.length ? (
-        <div className="breaker-card__devices">
-          {breaker.linked_devices.map((dev) => (
-            <span key={dev.id} className="pill">
-              {dev.name}
-            </span>
-          ))}
-        </div>
-      ) : (
-        <div className="breaker-card__muted">No devices linked</div>
-      )}
     </button>
   );
 }

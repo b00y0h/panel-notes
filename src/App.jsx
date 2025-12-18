@@ -177,7 +177,7 @@ export default function App() {
       <header className="topbar">
         <div>
           <p className="eyebrow">Panel Notes</p>
-          <h1>Main panel</h1>
+          <h1>Main Panel</h1>
         </div>
         <div className="topbar-actions">
           {tabs.map((tab) => (
@@ -194,7 +194,7 @@ export default function App() {
 
       {error && <div className="toast error">⚠️ {error}</div>}
 
-      <div className="layout">
+      <main className="layout">
         <section className="primary-pane">
           {loading ? (
             <div className="card">Loading panel data.</div>
@@ -215,6 +215,10 @@ export default function App() {
               onCreateDevice={handleCreateDevice}
               onUpdateDevice={handleUpdateDevice}
               onDeleteDevice={handleDeleteDevice}
+              onSelectBreaker={(id) => {
+                setSelectedBreakerId(id);
+                setView('dashboard');
+              }}
             />
           ) : (
             <SearchPage
@@ -229,7 +233,22 @@ export default function App() {
             />
           )}
         </section>
-      </div>
+      </main>
+
+      <nav className="bottom-nav">
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            className={`bottom-nav-item ${view === tab.id ? 'active' : ''}`}
+            onClick={() => setView(tab.id)}
+          >
+            <span className="bottom-nav-icon">
+              {tab.id === 'dashboard' ? '⚡' : tab.id === 'devices' ? '💡' : '🔍'}
+            </span>
+            <span>{tab.label}</span>
+          </div>
+        ))}
+      </nav>
 
       {showEditor && selectedBreaker && (
         <div
@@ -246,7 +265,7 @@ export default function App() {
           >
             <div className="modal-close">
               <button className="ghost" onClick={() => setShowEditor(false)}>
-                Close
+                ✕
               </button>
             </div>
             <BreakerDetail
